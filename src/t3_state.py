@@ -4,6 +4,7 @@ from t3_action import *
 import copy
 import itertools
 
+
 @dataclass
 class T3State:
     """
@@ -11,7 +12,7 @@ class T3State:
     and ability to obtain the actions and transitions possible (among other state
     utility methods).
     """
-    
+
     # The maximum numerical move available to either player, though odds will get
     # all odds from 1 to MAX_MOVE (inclusive), and evens all even numbers
     MAX_MOVE = 6
@@ -19,7 +20,7 @@ class T3State:
     WIN_TARGET = 13
     # The default size of the game board, though can be arbitrarily larger
     DEFAULT_SIZE = 3
-    
+
     def __init__(self, odd_turn: bool, state: Optional[list[list[int]]]):
         """
         Constructs a new T3 Board State from either the one provided,
@@ -34,33 +35,33 @@ class T3State:
                 The board state, which must be a square N x N grid
         """
         if state:
-            self._state: list[list[int]] = state 
+            self._state: list[list[int]] = state
         else:
-            self._state = [[0]*T3State.DEFAULT_SIZE for x in range(T3State.DEFAULT_SIZE)]
+            self._state = [[0] * T3State.DEFAULT_SIZE for x in range(T3State.DEFAULT_SIZE)]
         self._rows: int = len(self._state)
         self._cols: int = len(self._state[0])
         self._odd_turn: bool = odd_turn
-    
+
     def is_valid_action(self, act: "T3Action") -> bool:
         """
         Determines if the provided action is legal within this state, as decided by
         whether or not the col and row are in range of the board, that spot is not
         occupied, and whether the move number is within the set of allowable player
         actions on the given turn.
-        
+
         Parameters:
             act (T3Action):
                 The action being judged for legality
-                
+
         Returns:
             Whether or not the given act is legal in this board state
         """
         return act.col() >= 0 and act.col() < self._rows and \
                act.row() >= 0 and act.row() < self._cols and \
                act.move() >= 0 and act.move() <= T3State.MAX_MOVE and \
-               act.move() % 2 == 1 if self._odd_turn else act.move() % 2 == 0 and \
-               self._state[act.row()][act.col()] == 0
-    
+               self._state[act.row()][act.col()] == 0 and \
+               act.move() % 2 == 1 if self._odd_turn else act.move() % 2 == 0
+
     def get_next_state(self, act: Optional["T3Action"]) -> "T3State":
         """
         Returns the next state representing the transition from the current state (self)
@@ -80,12 +81,12 @@ class T3State:
         """
         if act is None or not self.is_valid_action(act):
             raise ValueError("[X] Chosen action " + str(act) + " is invalid!")
-        
+
         next_state = copy.deepcopy(self)
         next_state._state[act.row()][act.col()] = act.move()
         next_state._odd_turn = not next_state._odd_turn
         return next_state
-    
+
     def get_open_tiles(self) -> list[tuple[int, int]]:
         """
         Returns a list of (x,y) = (c,r) tuples indicating the open tiles into which
@@ -98,7 +99,7 @@ class T3State:
         """
         tile_pos = itertools.product(range(self._cols), range(self._rows))
         return [(c, r) for (c, r) in tile_pos if self._state[r][c] == 0]
-    
+
     def get_moves(self) -> list[int]:
         """
         Returns the list of "move" options for any open tile available to the 
@@ -112,10 +113,10 @@ class T3State:
             list[int]:
                 The list of int moves available to the player in any open tile.
         """
-        return [move for move in range(1, T3State.MAX_MOVE+1) if \
+        return [move for move in range(1, T3State.MAX_MOVE + 1) if \
                 (self._odd_turn and move % 2 == 1) or \
                 (not self._odd_turn and move % 2 == 0)]
-    
+
     def is_win(self) -> bool:
         """
         Returns whether or not the current state is in a win condition, i.e.,
@@ -133,7 +134,7 @@ class T3State:
         diag1 = [sum([self._state[x][x] for x in range(self._rows)])]
         diag2 = [sum([self._state[x][self._cols - 1 - x] for x in range(self._rows)])]
         return T3State.WIN_TARGET in (rows + cols + diag1 + diag2)
-    
+
     def is_tie(self) -> bool:
         """
         Returns whether or not the current state is a tie condition, i.e., the
@@ -144,62 +145,31 @@ class T3State:
                 Whether or not the state is a tie.
         """
         return not self.is_win() and not self.get_open_tiles()
-    
+
     def __str__(self) -> str:
         return "\n".join([str(r) for r in self._state])
-    
+
     def __eq__(self, other: Any) -> bool:
         if other is None: return False
         if not isinstance(other, T3State): return False
         return self._state == other._state and self._odd_turn == other._odd_turn
-    
+
     def __hash__(self) -> int:
         return hash((str(self._state), self._odd_turn))
-    
+
     # DO NOT TOUCH ABOVE THIS LINE! Your work is below!
     # ---------------------------------------------------------------------------
-    
-    def get_transitions(self) -> Iterator[tuple["T3Action", "T3State"]]:
-        """
-        Returns a Generator of the transitions from this state, viz., tuples of
-        T3Actions mapped to the next T3States they lead to from the current state.
-        
-        [!] Note: for convenience in the T3Player, should generate tuples in order
-        of the T3Action tiebreaking order!
-        
-        Example:
-            [6, 4, 1]
-            [1, 1, 4]
-            [4, 1, 0]
-        
-            If even's turn, there is 1 open tiles in which to move, with the
-            following combos that would be generated (note each item is a tuple of
-            the format (T3Action, T3State)):
-            
-            (T3Action(2, 2, 2),
-             T3State(True, [
-                 [6, 4, 1],
-                 [1, 1, 4],
-                 [4, 1, 2]
-             ]))
-            (T3Action(2, 2, 4),
-             T3State(True, [
-                 [6, 4, 1],
-                 [1, 1, 4],
-                 [4, 1, 4]
-             ]))
-            (T3Action(2, 2, 6),
-             T3State(True, [
-                 [6, 4, 1],
-                 [1, 1, 4],
-                 [4, 1, 6]
-             ]))
-        
-        Returns:
-            Iterator[tuple["T3Action", "T3State"]]:
-                A Generator of transition tuples of the format (T3Action, T3State)
-        """
-        # [!] TODO! (delete these next 2 lines to start)
-        return
-        yield
-        
+
+    def get_transitions(self) -> Generator:
+        open_tiles = self.get_open_tiles()
+
+        # Generate transitions
+        for col, row in open_tiles:
+            available_moves = self.get_moves()
+
+            for move in available_moves:
+                action = T3Action(col, row, move)
+                new_state = self.get_next_state(action)
+
+                # Yield the action and the new state as a tuple
+                yield action, new_state
