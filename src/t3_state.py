@@ -157,8 +157,6 @@ class T3State:
     def __hash__(self) -> int:
         return hash((str(self._state), self._odd_turn))
 
-    # DO NOT TOUCH ABOVE THIS LINE! Your work is below!
-    # ---------------------------------------------------------------------------
 
     def get_transitions(self) -> Generator:
         open_tiles = self.get_open_tiles()

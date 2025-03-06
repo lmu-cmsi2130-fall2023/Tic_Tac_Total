@@ -4,7 +4,7 @@ from t3_player import *
 import unittest
 import pytest
 
-# The beginning board state; can be customized for debugging or
+# The beginning board state, can be customized for debugging or
 # playing on non-standard boards like a 4x4 battlefied extreme
 # (though beware that the AI will take a long time to think on
 # larger board states)

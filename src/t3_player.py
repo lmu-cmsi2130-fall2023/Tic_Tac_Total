@@ -1,7 +1,3 @@
-"""
-Artificial Intelligence responsible for playing the game of T3!
-Implements the alpha-beta-pruning mini-max search algorithm
-"""
 from dataclasses import *
 from typing import *
 from t3_state import *

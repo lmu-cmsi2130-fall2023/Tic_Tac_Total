@@ -201,13 +201,7 @@ class T3GradingTests(unittest.TestCase):
         action = choose(t3state)
         self.assertEqual(T3Action(0, 1, 2), action)
         
-    # Depth-tricky Cases
-    # ---------------------------------------------------------------------------
-    
-    # [!] VERY IMPORTANT TODO:
-    # Make your own test cases to make sure that the depth tiebreaking works as
-    # intended -- invent some edge cases to make sure that depth of terminal is
-    # being correctly minimized in your agent's decisions!
+
     
 if __name__ == '__main__':
     unittest.main()

@@ -3,13 +3,6 @@ from typing import *
 
 @dataclass
 class T3Action:
-    """
-    T3Actions are agent-specified manipulations on the game
-    board such that they indicate which column, row, (both 0
-    indexed), and number / move they would like to make.
-    T3Actions implement Comparable and are ordered in ascending
-    column, row, then move number.
-    """
     
     _col: int
     _row: int
